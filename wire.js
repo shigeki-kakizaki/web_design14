@@ -39,6 +39,7 @@ function fireWireToMouse(mouseX, mouseY) {
 
 // ワイヤ解除
 function detachWire() {
+  // ★横も加味版：速度はそのまま（慣性を残す）
   wire.phase = "none";
 }
 
