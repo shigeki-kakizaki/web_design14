@@ -5,42 +5,25 @@ const ctx = canvas.getContext("2d");
 canvas.width = GAME_WIDTH;
 canvas.height = GAME_HEIGHT;
 
-const keys = { left: false, right: false };
 const mouse = { x: GAME_WIDTH / 2, y: GAME_HEIGHT / 2 };
-
 let lastTime = 0;
 
 function handleKeyDown(e) {
   switch (e.key) {
-    case "ArrowLeft":
-      keys.left = true;
-      player.dir = -1;
-      break;
-    case "ArrowRight":
-      keys.right = true;
-      player.dir = 1;
-      break;
     case " ":
+      // ★追加：フック中 Space で引っ張りジャンプ（13-6）
       if (wire.phase === "hooked") {
         pullJumpFromWire();
-      } else if (player.onGround) {
-        player.vy = JUMP_SPEED;
-        player.onGround = false;
       }
       break;
+
     case "x":
     case "X":
+      // 解除（14-3）
       if (wire.phase === "hooked" || wire.phase === "flying") {
         detachWire();
       }
       break;
-  }
-}
-
-function handleKeyUp(e) {
-  switch (e.key) {
-    case "ArrowLeft": keys.left = false; break;
-    case "ArrowRight": keys.right = false; break;
   }
 }
 
@@ -57,18 +40,17 @@ function handleMouseDown(e) {
 }
 
 document.addEventListener("keydown", handleKeyDown);
-document.addEventListener("keyup", handleKeyUp);
 canvas.addEventListener("mousemove", handleMouseMove);
 canvas.addEventListener("mousedown", handleMouseDown);
 
-// フック中のワイヤ方向ジャンプ（前回確定版）
+// ★追加：ワイヤ方向に引っ張るジャンプ（13-6）
 function pullJumpFromWire() {
   if (wire.phase !== "hooked") return;
 
   const ax = wire.ex;
   const ay = wire.ey;
 
-  // プレイヤー → アンカー方向（ワイヤ方向）
+  // プレイヤー→アンカー方向（ワイヤ方向）
   let dx = ax - player.x;
   let dy = ay - player.y;
   let dist = Math.hypot(dx, dy);
@@ -82,9 +64,11 @@ function pullJumpFromWire() {
   dx /= dist;
   dy /= dist;
 
+  // ワイヤ方向へ加速（速度を加算）
   player.vx += dx * PULL_JUMP_SPEED;
   player.vy += dy * PULL_JUMP_SPEED;
 
+  // 解除して自由落下へ
   detachWire();
 }
 
@@ -92,10 +76,9 @@ function update(dt) {
   updateWire(dt);
 
   if (wire.phase === "hooked") {
-    // ★ 14-4版：スイング操作なし
-    updatePlayerSwing(dt, wire);
+    updatePlayerSwing(dt, wire);   // 振り子
   } else {
-    updatePlayerNormal(dt, keys);
+    updatePlayerNormal(dt);        // 入力なし：落下＋着地
   }
 }
 
@@ -119,9 +102,8 @@ function drawBackground() {
 function drawHUD() {
   ctx.fillStyle = "#fff";
   ctx.font = "14px system-ui";
-  ctx.fillText("←→: 移動 / Space: ジャンプ（フック中はワイヤ方向ジャンプ）", 20, 24);
-  ctx.fillText("左クリック: ワイヤ発射 / X: ワイヤ解除", 20, 44);
-  ctx.fillText("※ 14-4版：フック中の“こぐ操作(スイング)”はまだ無い", 20, 64);
+  ctx.fillText("左クリック: ワイヤ発射 / Space: 引っ張りジャンプ / X: 解除", 20, 24);
+  ctx.fillText("※移動・通常ジャンプはまだ無し（振り子＋解除＋引っ張り）", 20, 44);
 }
 
 function draw() {

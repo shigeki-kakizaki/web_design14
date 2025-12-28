@@ -2,31 +2,17 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>ワイヤーアクション（14-4まで）</title>
+  <title>ワイヤーアクション（14-3）</title>
   <style>
-    body {
-      margin: 0;
-      background: #111;
-      color: #eee;
-      font-family: system-ui, sans-serif;
-      text-align: center;
-    }
-    canvas {
-      display: block;
-      margin: 16px auto;
-      background: #1c2235;
-      border: 2px solid #fff;
-    }
+    body { margin: 0; background:#111; color:#eee; font-family:system-ui,sans-serif; text-align:center; }
+    canvas { display:block; margin:16px auto; background:#1c2235; border:2px solid #fff; }
   </style>
 </head>
 <body>
-  <h1>ワイヤーアクション（14-4まで）</h1>
+  <h1>ワイヤーアクション（14-3：振り子＋解除）</h1>
   <canvas id="game" width="800" height="450"></canvas>
 
-  <p>
-    操作：← → 移動 / Space ジャンプ（フック中はワイヤ方向ジャンプ） /
-    左クリック ワイヤ発射 / X ワイヤ解除
-  </p>
+  <p>操作：左クリック＝ワイヤ発射 / X＝解除（落下）</p>
 
   <script src="config.js"></script>
   <script src="player.js"></script>

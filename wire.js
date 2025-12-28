@@ -1,12 +1,11 @@
 "use strict";
 
-// ワイヤの状態管理
 const wire = {
-  phase: "none", // "none" | "flying" | "hooked"
-  sx: 0, sy: 0,  // 発射位置
-  ex: 0, ey: 0,  // 先端 or アンカー位置
-  vx: 0, vy: 0,  // 先端の速度（飛行中）
-  length: 0      // プレイヤーとの距離（フック後）
+  phase: "none", // none | flying | hooked
+  sx: 0, sy: 0,
+  ex: 0, ey: 0,
+  vx: 0, vy: 0,
+  length: 0
 };
 
 function resetWire() {
@@ -16,9 +15,8 @@ function resetWire() {
   wire.length = 0;
 }
 
-// マウス方向にワイヤを発射
 function fireWireToMouse(mouseX, mouseY) {
-  if (wire.phase !== "none") return; // 既に存在する場合は何もしない
+  if (wire.phase !== "none") return;
 
   wire.phase = "flying";
   wire.sx = player.x;
@@ -37,13 +35,12 @@ function fireWireToMouse(mouseX, mouseY) {
   wire.length = 0;
 }
 
-// ワイヤ解除
 function detachWire() {
-  // ★横も加味版：速度はそのまま（慣性を残す）
+  // ★14-3：解除＝ワイヤを外すだけ（速度は保持）
+  // player.vx = 0;
   wire.phase = "none";
 }
 
-// ワイヤの更新（飛行中→フックなど）
 function updateWire(dt) {
   if (wire.phase === "flying") {
     wire.ex += wire.vx * dt;
@@ -53,17 +50,15 @@ function updateWire(dt) {
     const dy = wire.ey - wire.sy;
     const dist = Math.hypot(dx, dy);
 
-    // 「天井」に届いたらフック
+    // 天井に届いたらフック
     if (wire.ey <= CEILING_HOOK_Y) {
       wire.phase = "hooked";
       wire.length = Math.hypot(player.x - wire.ex, player.y - wire.ey);
-      if (wire.length < 60) {
-        wire.length = 60; // 近すぎると不自然なので最低長さを確保
-      }
+      if (wire.length < 60) wire.length = 60;
       return;
     }
 
-    // 画面外 or 射程距離を超えたらキャンセル
+    // 射程超え or 画面外
     if (
       dist > MAX_WIRE_DIST ||
       wire.ex < 0 || wire.ex > GAME_WIDTH ||
@@ -74,11 +69,9 @@ function updateWire(dt) {
   }
 }
 
-// ワイヤの描画
 function drawWire(ctx) {
   if (wire.phase === "none") return;
 
-  // ロープ本体
   ctx.strokeStyle = "#7ef5e1";
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -86,7 +79,6 @@ function drawWire(ctx) {
   ctx.lineTo(wire.ex, wire.ey);
   ctx.stroke();
 
-  // フックしているときはアンカーの目印
   if (wire.phase === "hooked") {
     ctx.fillStyle = "#e6ff80";
     ctx.beginPath();
