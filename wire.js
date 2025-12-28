@@ -13,7 +13,7 @@ function resetWire() {
   wire.vx = wire.vy = 0;
 }
 
-function fireWireToMouse(mouseX, mouseY) {
+function fireWireFixed() {
   if (wire.phase !== "none") return;
 
   wire.phase = "flying";
@@ -22,11 +22,10 @@ function fireWireToMouse(mouseX, mouseY) {
   wire.ex = player.x;
   wire.ey = player.y;
 
-  let dx = mouseX - player.x;
-  let dy = mouseY - player.y;
-  let len = Math.hypot(dx, dy) || 1;
-  dx /= len;
-  dy /= len;
+  const angle = 60 * Math.PI / 180; // 度 → ラジアン
+
+  const dx = Math.cos(angle);
+  const dy = -Math.sin(angle);
 
   wire.vx = dx * WIRE_SPEED;
   wire.vy = dy * WIRE_SPEED;

@@ -19,7 +19,7 @@ function handleMouseMove(e) {
 
 function handleMouseDown(e) {
   if (e.button === 0) {
-    fireWireToMouse(mouse.x, mouse.y);
+    fireWireFixed(mouse.x, mouse.y);
   }
 }
 
@@ -48,8 +48,8 @@ function drawBackground() {
 function drawHUD() {
   ctx.fillStyle = "#fff";
   ctx.font = "14px system-ui";
-  ctx.fillText("左クリック: マウス方向にワイヤ発射（一定距離で消える）", 20, 24);
-  ctx.fillText("※13-4：フックなし / 引っ張りジャンプなし / 解除なし", 20, 44);
+  ctx.fillText("左クリック: 固定方向にワイヤ発射（一定距離で消える）", 20, 24);
+  ctx.fillText("※13-3：フックなし / 引っ張りジャンプなし / 解除なし", 20, 44);
 }
 
 function draw() {
