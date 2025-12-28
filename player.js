@@ -15,7 +15,7 @@ function resetPlayer() {
   // ★14-3：少し高い初期位置（足場の上）
   // 足場：x=120..320, y=320, 上面y=320
   player.x = 200;
-  player.y = 320 - player.r; // 足場上
+  player.y = 300 - player.r; // 足場上
   player.prevY = player.y;
 
   player.vx = 0;
@@ -68,46 +68,6 @@ function updatePlayerNormal(dt) {
   // 画面端（今回はほぼ動かないが保険）
   if (player.x - player.r < 0) player.x = player.r;
   if (player.x + player.r > GAME_WIDTH) player.x = GAME_WIDTH - player.r;
-}
-
-// フック中（振り子運動：自然に揺れるだけ）
-function updatePlayerSwing(dt, wire) {
-  player.prevY = player.y;
-
-  const ax = wire.ex;
-  const ay = wire.ey;
-  const R = wire.length;
-
-  // 重力
-  player.vy += GRAVITY * dt;
-
-  // いったん自由落下で更新
-  player.x += player.vx * dt;
-  player.y += player.vy * dt;
-
-  // アンカー→プレイヤー
-  let dx = player.x - ax;
-  let dy = player.y - ay;
-  let dist = Math.hypot(dx, dy);
-
-  if (dist === 0) {
-    dist = 0.0001;
-    dx = 0; dy = 1;
-  }
-
-  dx /= dist;
-  dy /= dist;
-
-  // 円周上に戻す
-  player.x = ax + dx * R;
-  player.y = ay + dy * R;
-
-  // ロープ方向成分を削る（接線方向のみ）
-  const vr = player.vx * dx + player.vy * dy;
-  player.vx -= vr * dx;
-  player.vy -= vr * dy;
-
-  player.onGround = false;
 }
 
 function drawPlayer(ctx) {
