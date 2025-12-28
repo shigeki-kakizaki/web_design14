@@ -11,7 +11,7 @@ let lastTime = 0;
 function handleKeyDown(e) {
   switch (e.key) {
     case " ":
-      // ★追加：フック中 Space で引っ張りジャンプ（13-6）
+      // ✅13-6：フック中 Space で引っ張りジャンプ（=解除を伴う）
       if (wire.phase === "hooked") {
         pullJumpFromWire();
       }
@@ -19,10 +19,7 @@ function handleKeyDown(e) {
 
     case "x":
     case "X":
-      // 解除（14-3）
-      if (wire.phase === "hooked" || wire.phase === "flying") {
-        detachWire();
-      }
+      // ❌14-3：Xでのフック解除は “削除” する（何もしない）
       break;
   }
 }
@@ -43,7 +40,7 @@ document.addEventListener("keydown", handleKeyDown);
 canvas.addEventListener("mousemove", handleMouseMove);
 canvas.addEventListener("mousedown", handleMouseDown);
 
-// ★追加：ワイヤ方向に引っ張るジャンプ（13-6）
+// ✅13-6：ワイヤ方向に引っ張るジャンプ（速度を加算して解除）
 function pullJumpFromWire() {
   if (wire.phase !== "hooked") return;
 
@@ -68,7 +65,7 @@ function pullJumpFromWire() {
   player.vx += dx * PULL_JUMP_SPEED;
   player.vy += dy * PULL_JUMP_SPEED;
 
-  // 解除して自由落下へ
+  // 引っ張りジャンプは「解除を伴う」仕様（13-6）
   detachWire();
 }
 
@@ -76,9 +73,11 @@ function update(dt) {
   updateWire(dt);
 
   if (wire.phase === "hooked") {
-    updatePlayerSwing(dt, wire);   // 振り子
+    // ✅14-2：フック後の振り子運動
+    updatePlayerSwing(dt, wire);
   } else {
-    updatePlayerNormal(dt);        // 入力なし：落下＋着地
+    // ✅入力なし：落下＋着地（滑り防止は player.js 側）
+    updatePlayerNormal(dt);
   }
 }
 
@@ -86,15 +85,18 @@ function drawBackground() {
   ctx.fillStyle = "#151a28";
   ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
+  // 天井ライン（フック位置）
   ctx.strokeStyle = "#444";
   ctx.beginPath();
   ctx.moveTo(0, CEILING_HOOK_Y);
   ctx.lineTo(GAME_WIDTH, CEILING_HOOK_Y);
   ctx.stroke();
 
+  // 地面
   ctx.fillStyle = "#30384a";
   ctx.fillRect(0, GROUND_Y, GAME_WIDTH, GAME_HEIGHT - GROUND_Y);
 
+  // 足場
   ctx.fillStyle = "#3b465e";
   ctx.fillRect(120, 320, 200, 20);
 }
@@ -102,8 +104,8 @@ function drawBackground() {
 function drawHUD() {
   ctx.fillStyle = "#fff";
   ctx.font = "14px system-ui";
-  ctx.fillText("左クリック: ワイヤ発射 / Space: 引っ張りジャンプ / X: 解除", 20, 24);
-  ctx.fillText("※移動・通常ジャンプはまだ無し（振り子＋解除＋引っ張り）", 20, 44);
+  ctx.fillText("左クリック: ワイヤ発射 / Space: 引っ張りジャンプ（解除を伴う）", 20, 24);
+  ctx.fillText("※X解除は未導入（14-3の機能を削除）", 20, 44);
 }
 
 function draw() {

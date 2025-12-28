@@ -43,7 +43,7 @@ function updatePlayerNormal(dt) {
     player.vy = 0;
     player.onGround = true;
 
-    player.vx = 0;
+    player.vx *= 0.85;
   }
 
   // 足場（上から乗る）
