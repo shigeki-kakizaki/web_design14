@@ -11,10 +11,7 @@ let lastTime = 0;
 function handleKeyDown(e) {
   switch (e.key) {
     case " ":
-      // ✅13-6：フック中 Space で引っ張りジャンプ（解除を伴う）
-      if (wire.phase === "hooked") {
-        pullJumpFromWire();
-      }
+      // ❌13-6：引っ張りジャンプはまだ無い
       break;
 
     case "x":
@@ -40,34 +37,6 @@ document.addEventListener("keydown", handleKeyDown);
 canvas.addEventListener("mousemove", handleMouseMove);
 canvas.addEventListener("mousedown", handleMouseDown);
 
-// ✅13-6：ワイヤ方向に引っ張るジャンプ（速度を加算して解除）
-function pullJumpFromWire() {
-  if (wire.phase !== "hooked") return;
-
-  const ax = wire.ex;
-  const ay = wire.ey;
-
-  // プレイヤー→アンカー方向（ワイヤ方向）
-  let dx = ax - player.x;
-  let dy = ay - player.y;
-  let dist = Math.hypot(dx, dy);
-
-  if (dist === 0) {
-    dist = 0.0001;
-    dx = 0;
-    dy = -1;
-  }
-
-  dx /= dist;
-  dy /= dist;
-
-  player.vx += dx * PULL_JUMP_SPEED;
-  player.vy += dy * PULL_JUMP_SPEED;
-
-  // 引っ張りジャンプは解除を伴う
-  detachWire();
-}
-
 function update(dt) {
   updateWire(dt);
 
@@ -79,7 +48,7 @@ function update(dt) {
     player.onGround = false;
     return;
   }
-  
+
   // 入力なし：落下＋着地（滑り防止は player.js 側）
   updatePlayerNormal(dt);
 }
