@@ -11,7 +11,7 @@ let lastTime = 0;
 function handleKeyDown(e) {
   switch (e.key) {
     case " ":
-      // ✅13-6：フック中 Space で引っ張りジャンプ（=解除を伴う）
+      // ✅13-6：フック中 Space で引っ張りジャンプ（解除を伴う）
       if (wire.phase === "hooked") {
         pullJumpFromWire();
       }
@@ -19,7 +19,7 @@ function handleKeyDown(e) {
 
     case "x":
     case "X":
-      // ❌14-3：Xでのフック解除は “削除” する（何もしない）
+      // ❌14-3：X解除はまだ無い
       break;
   }
 }
@@ -61,11 +61,10 @@ function pullJumpFromWire() {
   dx /= dist;
   dy /= dist;
 
-  // ワイヤ方向へ加速（速度を加算）
   player.vx += dx * PULL_JUMP_SPEED;
   player.vy += dy * PULL_JUMP_SPEED;
 
-  // 引っ張りジャンプは「解除を伴う」仕様（13-6）
+  // 引っ張りジャンプは解除を伴う
   detachWire();
 }
 
@@ -73,19 +72,23 @@ function update(dt) {
   updateWire(dt);
 
   if (wire.phase === "hooked") {
-    // ✅14-2：フック後の振り子運動
-    updatePlayerSwing(dt, wire);
-  } else {
-    // ✅入力なし：落下＋着地（滑り防止は player.js 側）
-    updatePlayerNormal(dt);
+    // ★13-6段階：フックしたら「そのまま」（振り子なし・固定もしない）
+    // 物理更新を止める＝落下もしない
+    player.vx = 0;
+    player.vy = 0;
+    player.onGround = false;
+    return;
   }
+  
+  // 入力なし：落下＋着地（滑り防止は player.js 側）
+  updatePlayerNormal(dt);
 }
 
 function drawBackground() {
   ctx.fillStyle = "#151a28";
   ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
-  // 天井ライン（フック位置）
+  // 天井ライン
   ctx.strokeStyle = "#444";
   ctx.beginPath();
   ctx.moveTo(0, CEILING_HOOK_Y);
@@ -104,8 +107,8 @@ function drawBackground() {
 function drawHUD() {
   ctx.fillStyle = "#fff";
   ctx.font = "14px system-ui";
-  ctx.fillText("左クリック: ワイヤ発射 / Space: 引っ張りジャンプ（解除を伴う）", 20, 24);
-  ctx.fillText("※X解除は未導入（14-3の機能を削除）", 20, 44);
+  ctx.fillText("左クリック: ワイヤ発射 / Space: 引っ張りジャンプ", 20, 24);
+  ctx.fillText("※13-6版：フック中は固定ぶら下がり（振り子はまだ無い）", 20, 44);
 }
 
 function draw() {
